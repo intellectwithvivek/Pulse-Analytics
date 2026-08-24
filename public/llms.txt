@@ -1,0 +1,89 @@
+# Pulse Analytics — free Next.js SaaS dashboard template
+
+> A complete, MIT-licensed Next.js 16 template: a marketing site plus a working
+> product-analytics dashboard. Every element of the interface, including all six charts,
+> is built with VivekUI — a free React component library with zero runtime dependencies.
+> Clone it, change the words, ship it.
+
+Built with VivekUI — a free React component library with zero runtime dependencies:
+91 accessible React components and 6 SVG charts, one install and one CSS import, no
+Tailwind and no config. Created by Vivek Kumar Singh.
+
+- Live demo: https://pulseanalytics.vivekkumarsingh.in
+- Template repository: https://github.com/intellectwithvivek/Pulse-Analytics
+- Clone: `git clone https://github.com/intellectwithvivek/Pulse-Analytics.git`
+- Install the library: `npm i @the_viveksingh/vivek-ui`
+- Library documentation: https://ui.vivekkumarsingh.in/docs
+- Chart documentation: https://ui.vivekkumarsingh.in/docs/charts
+- npm: https://www.npmjs.com/package/@the_viveksingh/vivek-ui
+- GitHub (library): https://github.com/intellectwithvivek/vivek_UI
+- Author: https://vivekkumarsingh.in/
+
+## Who this is for
+
+Developers and teams who want a finished Next.js SaaS starting point rather than a blank
+`create-next-app`. It is a public template repository: clone or use "Use this template"
+on GitHub, replace the mock data in `data/`, change the copy, and deploy. There is no
+`.env` to fill in, no database, and no auth to unpick.
+
+## Stack
+
+- Next.js 16.3.x, App Router, Turbopack (the default bundler)
+- React 19, TypeScript 5
+- Node.js 20.9+ (22 LTS recommended)
+- @the_viveksingh/vivek-ui 0.5.x — the only UI dependency
+- No Tailwind, no shadcn, no MUI, no Recharts, no Chart.js, no D3
+
+Full dependency list: `next`, `react`, `react-dom`, `@the_viveksingh/vivek-ui`.
+
+## Pages
+
+- `/` — marketing homepage. The hero "screenshot" is not an image: it is a live panel
+  rendering a real AreaChart and four real Sparklines.
+- `/pricing` — three plans, a monthly/yearly Switch, a feature comparison Table, an FAQ.
+- `/dashboard` — the charts showcase. Four KPI cards each with a Sparkline, plus an
+  AreaChart, a BarChart, a LineChart, a PieChart and three ProgressRings.
+- `/dashboard/customers` — a DataTable with sorting, search, pagination, row selection,
+  status badges, avatars, row-action menus and an empty state.
+- `/dashboard/roadmap` — a KanbanBoard with drag-and-drop and a full keyboard move path.
+- `/dashboard/reports` — a date range, a four-chart grid, and an export that raises a Toast.
+- `/built-with` — every component used, mapped to the section it draws and deep-linked
+  to its documentation.
+
+## The six charts
+
+All six ship inside the component library. There is no chart library in package.json.
+
+| Chart | Used for |
+| --- | --- |
+| `AreaChart` | Revenue over the last 30 days |
+| `BarChart` | Signups by channel; feature adoption (horizontal) |
+| `LineChart` | Retention across three cohorts |
+| `PieChart` | Plan mix, as a donut |
+| `ProgressRing` | Three quarterly goals |
+| `Sparkline` | The trend inside each KPI card |
+
+Every chart is pure SVG with no measurement step, so all of them render in React Server
+Components and appear in the HTML before any JavaScript executes. Each one also emits a
+visually hidden data table, and distinguishes series by dash pattern and marker shape as
+well as by colour, so the charts stay readable in greyscale and with any form of colour
+blindness.
+
+## Customising it
+
+1. `lib/site.ts` — domain, repository URL and the UTM helper. `SITE.url` is what
+   `metadataBase`, the canonical tags, the sitemap and every JSON-LD node derive from,
+   so change it first.
+2. `data/` — `analytics.ts`, `customers.ts` and `roadmap.ts` hold every number on the
+   site as typed modules. Replace them with your own fetches; the chart shapes are the
+   library's own types, so no transform layer is needed.
+3. `lib/content.ts` — pricing plans, the comparison matrix and the FAQ (which also feeds
+   the FAQPage structured data, so the two can never disagree).
+4. `app/globals.css` — the accent lives in about eight CSS custom properties at the top.
+5. `components/site/logo.tsx`, `app/icon.svg`, `app/opengraph-image.tsx` — the brand.
+
+## Licence
+
+MIT, for both this template and VivekUI itself. Free for commercial use, including in
+client work. The "Built with VivekUI" credit in the footer is removable; a star on the
+repository is appreciated.

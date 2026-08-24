@@ -1,26 +1,472 @@
-@import "tailwindcss";
+/*
+ * Pulse — site styles.
+ *
+ * Two rules hold throughout: every library selector ships wrapped in `:where()`, so a
+ * single flat class of ours already wins with no `!important` anywhere; and anything
+ * that could be a token is a token, so the accent below re-skins the whole library.
+ */
+
+/* ------------------------------------------------------------------ Brand tokens */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Violet accent. #6d28d9 clears 7:1 against white, so white-on-violet buttons pass
+     AA at every size rather than only at large text. */
+  --vk-color-primary: #6d28d9;
+  --vk-color-primary-fg: #ffffff;
+  --vk-color-primary-hover: #5b21b6;
+  --vk-color-primary-active: #4c1d95;
+  --vk-color-primary-subtle: #f5f0ff;
+  --vk-color-primary-subtle-fg: #5b21b6;
+  --vk-color-ring: #6d28d9;
+
+  /* Series 1 carries the brand, because it is what Sparkline and ProgressRing default
+     to. Series 2-6 keep the library's Okabe-Ito values: they are chosen to stay apart
+     under every form of colour blindness, and replacing them to be on-brand would be
+     trading an accessibility property for a decorative one. */
+  --vk-chart-1: #6d28d9;
+
+  --font-display: var(--font-geist-sans), var(--vk-font-sans);
+  --pulse-glow: color-mix(in oklab, var(--vk-color-primary) 22%, transparent);
+  --pulse-panel-grid: color-mix(in oklab, var(--vk-color-fg) 6%, transparent);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:where([data-theme='dark']) {
+  --vk-color-primary: #a78bfa;
+  --vk-color-primary-fg: #140b26;
+  --vk-color-primary-hover: #c4b5fd;
+  --vk-color-primary-active: #8b5cf6;
+  --vk-color-primary-subtle: #241a3d;
+  --vk-color-primary-subtle-fg: #d3c4fe;
+  --vk-color-ring: #a78bfa;
+
+  --vk-chart-1: #a78bfa;
+
+  --pulse-glow: color-mix(in oklab, var(--vk-color-primary) 26%, transparent);
+  --pulse-panel-grid: color-mix(in oklab, var(--vk-color-fg) 8%, transparent);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+ * `color-scheme` is keyed off the attribute rather than off `html`, because the
+ * dashboard re-points `data-theme` on a wrapper (and on `body`, for portalled
+ * overlays). Binding it to `html` alone would leave a dark dashboard with light
+ * native scrollbars and a light date-picker calendar whenever the OS is light.
+ * It inherits, so setting it on the wrapper covers everything inside.
+ */
+:where(html, [data-theme='light']) {
+  color-scheme: light;
+}
+
+:where([data-theme='dark']) {
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------------------- Base */
+
+:where(body) {
+  background: var(--vk-color-bg);
+  color: var(--vk-color-fg);
+  font-family: var(--vk-font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:where(h1, h2, h3, .pulse-figure) {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Figures line up in a column only with tabular digits, and every dashboard number
+   here is a figure. */
+.pulse-figure {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+/* Skip link: present for keyboard users, out of the way for everyone else. */
+.pulse-skip {
+  position: absolute;
+  inset-inline-start: var(--vk-space-4);
+  inset-block-start: -100%;
+  z-index: 100;
+  padding: var(--vk-space-3) var(--vk-space-4);
+  border-radius: var(--vk-radius-md);
+  background: var(--vk-color-primary);
+  color: var(--vk-color-primary-fg);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pulse-skip:focus-visible {
+  inset-block-start: var(--vk-space-4);
+}
+
+/* ------------------------------------------------------------------ Marketing */
+
+/* The aurora behind the hero. One radial gradient, no image request, and it sits on a
+   pseudo-element so it never becomes a stacking-context problem for the panel. */
+.pulse-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+}
+
+.pulse-hero::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset-block-start: -30%;
+  inset-inline: -10%;
+  block-size: 90%;
+  background:
+    radial-gradient(60% 55% at 25% 30%, var(--pulse-glow), transparent 70%),
+    radial-gradient(45% 45% at 80% 10%, var(--pulse-glow), transparent 70%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+/*
+ * The signature element: the hero "screenshot" is a real panel of real charts, so it
+ * gets the chrome a screenshot would have had. The dot row is decorative and hidden
+ * from assistive tech in the markup.
+ */
+.pulse-panel {
+  position: relative;
+  border: 1px solid var(--vk-color-border);
+  border-radius: var(--vk-radius-lg);
+  background: var(--vk-color-surface);
+  box-shadow: var(--vk-shadow-lg);
+  overflow: clip;
+}
+
+.pulse-panel-bar {
+  display: flex;
+  gap: var(--vk-space-2);
+  align-items: center;
+  padding: var(--vk-space-3) var(--vk-space-4);
+  border-block-end: 1px solid var(--vk-color-border-subtle);
+  background: var(--vk-color-surface-subtle);
+}
+
+.pulse-panel-dot {
+  inline-size: 0.625rem;
+  block-size: 0.625rem;
+  border-radius: 999px;
+  background: var(--vk-color-border-strong);
+  opacity: 0.55;
+}
+
+.pulse-panel-title {
+  margin-inline-start: var(--vk-space-2);
+  color: var(--vk-color-muted);
+  font-family: var(--vk-font-mono);
+  font-size: 0.75rem;
+}
+
+.pulse-panel-body {
+  padding: var(--vk-space-5);
+  /* Faint graph paper, so the panel reads as an instrument rather than a card. */
+  background-image:
+    linear-gradient(to right, var(--pulse-panel-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--pulse-panel-grid) 1px, transparent 1px);
+  background-size: 2rem 2rem;
+}
+
+/* KPI strip inside the hero panel. */
+.pulse-kpi-strip {
+  display: grid;
+  gap: var(--vk-space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-block-start: var(--vk-space-5);
+}
+
+@media (min-width: 40rem) {
+  .pulse-kpi-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.pulse-kpi-mini {
+  padding: var(--vk-space-3);
+  border: 1px solid var(--vk-color-border-subtle);
+  border-radius: var(--vk-radius-md);
+  background: var(--vk-color-surface);
+}
+
+.pulse-kpi-mini-label {
+  color: var(--vk-color-muted);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Trailing marker on the "live" label. Suppressed under reduced motion, not slowed. */
+.pulse-live {
+  display: inline-flex;
+  gap: var(--vk-space-2);
+  align-items: center;
+  font-family: var(--vk-font-mono);
+  font-size: 0.75rem;
+  color: var(--vk-color-muted);
+}
+
+.pulse-live::before {
+  content: '';
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 999px;
+  background: var(--vk-color-primary);
+  animation: pulse-blink 2s ease-in-out infinite;
+}
+
+@keyframes pulse-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-live::before {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ Dashboard */
+
+/*
+ * Shell: a fixed rail beside a scrolling column. The sidebar sets its own width via
+ * --vk-sidebar-width, so the grid reads that variable instead of hard-coding 16rem.
+ */
+.dash {
+  min-block-size: 100dvh;
+  background: var(--vk-color-bg);
+  color: var(--vk-color-fg);
+}
+
+.dash-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-block-size: 100dvh;
+}
+
+@media (min-width: 60rem) {
+  .dash-layout {
+    grid-template-columns: auto 1fr;
+  }
+}
+
+.dash-rail {
+  display: none;
+  border-inline-end: 1px solid var(--vk-color-border);
+  background: var(--vk-color-surface);
+}
+
+@media (min-width: 60rem) {
+  .dash-rail {
+    display: block;
+    position: sticky;
+    inset-block-start: 0;
+    block-size: 100dvh;
+    overflow-y: auto;
+  }
+}
+
+.dash-main {
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-topbar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 20;
+  display: flex;
+  gap: var(--vk-space-3);
+  align-items: center;
+  padding: var(--vk-space-3) var(--vk-space-4);
+  border-block-end: 1px solid var(--vk-color-border);
+  background: color-mix(in oklab, var(--vk-color-bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.dash-content {
+  flex: 1;
+  padding: var(--vk-space-6) var(--vk-space-4);
+}
+
+@media (min-width: 60rem) {
+  .dash-content {
+    padding: var(--vk-space-8);
+  }
+}
+
+/* A search-shaped button that opens the palette. It is a button, not an input: it does
+   not accept text, and typing into a fake input that steals your keystrokes is worse
+   than a button that says what it does. */
+.dash-search {
+  display: flex;
+  flex: 1;
+  gap: var(--vk-space-2);
+  align-items: center;
+  max-inline-size: 22rem;
+  padding: var(--vk-space-2) var(--vk-space-3);
+  border: 1px solid var(--vk-color-border);
+  border-radius: var(--vk-radius-md);
+  background: var(--vk-color-surface-subtle);
+  color: var(--vk-color-muted);
+  font-size: 0.875rem;
+  text-align: start;
+  cursor: pointer;
+}
+
+.dash-search:hover {
+  border-color: var(--vk-color-border-strong);
+}
+
+.dash-search-hint {
+  margin-inline-start: auto;
+}
+
+/* The rail and the drawer trigger are mutually exclusive, and each is removed from the
+   DOM flow rather than merely hidden, so neither becomes a duplicate tab stop. */
+.dash-only-narrow {
+  display: inline-flex;
+}
+
+.dash-only-wide {
+  display: none;
+}
+
+@media (min-width: 60rem) {
+  .dash-only-narrow {
+    display: none;
+  }
+
+  .dash-only-wide {
+    display: inline-flex;
+  }
+}
+
+/* Section grid for the chart cards. */
+.dash-grid {
+  display: grid;
+  gap: var(--vk-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+}
+
+.dash-grid-wide {
+  grid-column: 1 / -1;
+}
+
+.dash-kpis {
+  display: grid;
+  gap: var(--vk-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+}
+
+/* Delta chip. Colour is doubled by the arrow glyph, so it never carries meaning alone. */
+.dash-delta {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-delta[data-intent='positive'] {
+  color: var(--vk-color-success);
+}
+
+.dash-delta[data-intent='negative'] {
+  color: var(--vk-color-danger);
+}
+
+.dash-goals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--vk-space-6);
+  justify-content: space-around;
+}
+
+.dash-goal {
+  text-align: center;
+}
+
+/* Ring centre content: a figure over a caption. */
+.dash-ring-value {
+  display: block;
+  font-size: 1.375rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-ring-caption {
+  display: block;
+  margin-block-start: 0.125rem;
+  color: var(--vk-color-muted);
+  font-size: 0.625rem;
+}
+
+.dash-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--vk-space-4);
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+/* ------------------------------------------------------------------ Promotion kit */
+
+/* The navbar badge is a link wrapping a Badge span, so the anchor carries no styling of
+   its own beyond killing the underline and inheriting the badge's colour. */
+.pulse-badge-link {
+  display: inline-flex;
+  border-radius: var(--vk-radius-full);
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Hidden below the navbar's collapse width: three actions plus a hamburger is a
+   crowded bar on a phone, and the footer carries the same link. */
+@media (max-width: 47.99rem) {
+  .pulse-badge-link {
+    display: none;
+  }
+}
+
+.promo-install {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--vk-space-2);
+  align-items: center;
+}
+
+.promo-footer-note {
+  max-inline-size: 34rem;
+}
+
+/* /built-with maps a section to the component that draws it; the component cell is the
+   scannable column, so it gets the mono treatment. */
+.builtwith-component {
+  font-family: var(--vk-font-mono);
+  font-size: 0.8125rem;
+}
+
+/* --------------------------------------------------------------- Utilities */
+
+.pulse-center {
+  text-align: center;
+}
+
+.pulse-mono {
+  font-family: var(--vk-font-mono);
+}
+
+.pulse-full {
+  inline-size: 100%;
+}
+
+.pulse-nowrap {
+  white-space: nowrap;
 }
