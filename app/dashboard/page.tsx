@@ -138,7 +138,7 @@ export default function DashboardPage() {
             data={PLAN_MIX}
             donut
             innerRadius={0.62}
-            size={240}
+            diameter={240}
             showLabels
             showLegend
             centerLabel="38.9k"
@@ -159,7 +159,7 @@ export default function DashboardPage() {
                 <ProgressRing
                   value={goal.value}
                   max={goal.max}
-                  size={116}
+                  diameter={116}
                   thickness={10}
                   label={goal.label}
                   title={`${goal.label}: ${goal.value}% of target`}
