@@ -85,7 +85,7 @@ export default function PricingPage() {
         <FAQ
           background="muted"
           name="pricing-faq"
-          defaultOpen={0}
+          defaultOpenIndex={0}
           eyebrow="FAQ"
           title="Billing and licensing"
           items={PRICING_FAQ.map((item) => ({

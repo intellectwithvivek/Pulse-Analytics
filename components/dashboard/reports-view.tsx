@@ -181,7 +181,7 @@ export function ReportsView() {
           <div style={{ marginBlockStart: 'var(--vk-space-3)' }}>
             <PieChart
               data={TRAFFIC_SOURCES}
-              size={220}
+              diameter={220}
               showLabels
               showLegend
               title="Sessions by traffic source"

@@ -263,7 +263,7 @@ export default function HomePage() {
           background="muted"
           // A shared `name` makes the group mutually exclusive natively — no JS.
           name="home-faq"
-          defaultOpen={0}
+          defaultOpenIndex={0}
           eyebrow="FAQ"
           title="Questions about the template"
           items={FAQ_ITEMS.map((item) => ({
@@ -274,7 +274,7 @@ export default function HomePage() {
         />
 
         <CTA
-          variant="primary"
+          background="primary"
           eyebrow="Take the whole thing"
           title="Clone it, rename it, ship it"
           description="Marketing site, dashboard, six charts, sitemap, structured data and a README. MIT licensed."
